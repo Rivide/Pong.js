@@ -25,7 +25,8 @@ class Player {
         this.score++;
     }
     move(direction, deltaTime) {
-        this.y += paddleSpeed * direction * deltaTime;
+        this.y = Math.max(Math.min(this.y + paddleSpeed * direction *
+            deltaTime, height - paddleHeight), 0);
     }
     draw(ctx, width, height) {
         ctx.fillStyle = "white";
