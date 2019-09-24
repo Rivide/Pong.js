@@ -3,6 +3,9 @@ let ctx = canvas.getContext("2d");
 let width = 600;
 let height = 480;
 
+let roundDelay = 1500;
+let timeToRound = 0;
+
 let paddleWidth = 10;
 let paddleHeight = 40;
 let paddleOffset = 60;
@@ -20,9 +23,6 @@ class Player {
         this.x = x;
         this.y = y;
         this.score = 0;
-    }
-    incrementScore() {
-        this.score++;
     }
     move(direction, deltaTime) {
         this.y = Math.max(Math.min(this.y + paddleSpeed * direction *
@@ -42,9 +42,7 @@ let ball = {
     inPlay: false,
     width: 10,
     height: 10,
-    visible: true,
     setInPlay: function(x, y) {
-        this.visible = true;
         this.x = width / 2 - this.width / 2;
         this.y = Math.random() * (height - this.height);
         let angle = Math.random() * 2 * Math.PI;
@@ -52,6 +50,9 @@ let ball = {
         this.directionY = Math.sign(Math.random() - .5) *
         Math.sqrt(1 - Math.pow(this.directionX, 2));
         this.inPlay = true;
+    },
+    setOutOfPlay() {
+        this.inPlay = false;
     },
     move: function(deltaTime) {
         this.x += this.directionX * this.speed * deltaTime;
@@ -87,7 +88,7 @@ let ball = {
         }
     },
     draw: function(ctx) {
-        if (this.visible) {
+        if (this.inPlay) {
             ctx.fillStyle = "white";
             ctx.fillRect(this.x, this.y, this.width, this.height);
         }
@@ -108,20 +109,9 @@ document.addEventListener("keyup", function(e) {
     }
 });
 let prevTime = 0;
-function draw() {
-
-}
 function update(timestamp) {
     let deltaTime = timestamp - prevTime;
     prevTime = timestamp;
-
-    if (!ball.inPlay) {
-        ball.setInPlay();
-        console.log("inPlay");
-    }
-    if (ball.inPlay) {
-        ball.move(deltaTime);
-    }
     if (keys.w) {
         player1.move(-1, deltaTime);
     }
@@ -134,16 +124,25 @@ function update(timestamp) {
     if (keys.ArrowDown) {
         player2.move(1, deltaTime);
     }
-    if (ball.x < 0 || ball.x + ball.width > width) {
-        if (ball.x < 0) {
-            player2.score++;
+    if (!ball.inPlay) {
+        timeToRound -= deltaTime;
+        if (timeToRound <= 0) {
+            ball.setInPlay();
         }
-        else {
-            player1.score++;
+    }
+    if (ball.inPlay) {
+        ball.move(deltaTime);
+        if (ball.x < 0 || ball.x + ball.width > width) {
+            if (ball.x < 0) {
+                player2.score++;
+            }
+            else {
+                player1.score++;
+            }
+            console.log("Scores: " + player1.score + " - " + player2.score);
+            ball.setOutOfPlay();
+            timeToRound = roundDelay;
         }
-        console.log("Scores: " + player1.score + " - " + player2.score);
-        ball.visible = false;
-        ball.setInPlay();
     }
 
     ctx.fillStyle = "black";
