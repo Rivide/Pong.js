@@ -11,6 +11,9 @@ let paddleHeight = 40;
 let paddleOffset = 60;
 let paddleSpeed = .25;
 
+let scoreOffsetX = 80;
+let scoreOffsetY = 30;
+
 let keys = {
     w: false,
     s: false,
@@ -29,7 +32,6 @@ class Player {
             deltaTime, height - paddleHeight), 0);
     }
     draw(ctx, width, height) {
-        ctx.fillStyle = "white";
         ctx.fillRect(this.x, this.y, width, height);
     }
 }
@@ -89,7 +91,6 @@ let ball = {
     },
     draw: function(ctx) {
         if (this.inPlay) {
-            ctx.fillStyle = "white";
             ctx.fillRect(this.x, this.y, this.width, this.height);
         }
     }
@@ -147,6 +148,14 @@ function update(timestamp) {
 
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, width, height);
+
+    ctx.fillStyle = "white";
+    ctx.font = "64px monospace";
+    ctx.textBaseline = "top";
+    ctx.textAlign = "right";
+    ctx.fillText(player1.score, width / 2 - scoreOffsetX, scoreOffsetY);
+    ctx.textAlign = "left";
+    ctx.fillText(player2.score, width / 2 + scoreOffsetX, scoreOffsetY);
 
     ball.draw(ctx);
     
