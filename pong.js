@@ -88,6 +88,7 @@ let ball = {
                 this.x -= 2 * (this.x + this.width - player2.x);
             }
         }
+
     },
     draw: function(ctx) {
         if (this.inPlay) {
