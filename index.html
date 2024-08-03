@@ -3,6 +3,13 @@
     <body>
         <h1>Pong</h1>
         <canvas id="canvas" width="600" height="480"></canvas>
+
+        <!--
+        This line requires `const io = new Server(server); io.on(...)` in the
+        server code. Otherwise you get a mime type error.
+        https://stackoverflow.com/questions/8689877/cant-find-socket-io-js
+        -->
+        <script src="/socket.io/socket.io.js"></script>
         <script src="pong.js"></script>
     </body>
 </html>
