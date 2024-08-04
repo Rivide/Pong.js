@@ -32,6 +32,11 @@ let paddleWidth = 10;
 let paddleHeight = 40;
 let paddleOffset = 60;
 let paddleSpeed = .25;
+const leftPaddleX = paddleOffset;
+const rightPaddleX = width - paddleOffset - paddleWidth;
+
+// const ballWidth = 10;
+// const ballHeight = 10;
 
 class Player {
   constructor(x, y) {
@@ -45,6 +50,8 @@ class Player {
           deltaTime, height - paddleHeight), 0);
   }
 }
+
+let games = []
 
 let ball = {
   x: 0,
@@ -201,12 +208,10 @@ function update(deltaTime) {
   }
   io.emit("state", {
     playerLeft: {
-      x: playerLeft.x,
       y: playerLeft.y,
       score: playerLeft.score
     },
     playerRight: {
-      x: playerRight.x,
       y: playerRight.y,
       score: playerRight.score
     },

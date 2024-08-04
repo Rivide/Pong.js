@@ -58,7 +58,6 @@ document.addEventListener("keyup", function(e) {
 });
 
 function updatePlayer(clientPlayer, serverPlayer) {
-  clientPlayer.x = serverPlayer.x;
   clientPlayer.y = serverPlayer.y;
   clientPlayer.score = serverPlayer.score;
 }
