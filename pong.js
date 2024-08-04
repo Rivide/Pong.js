@@ -207,5 +207,3 @@ function loop(timestamp) {
     requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
-
-const socket = io();
