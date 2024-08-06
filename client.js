@@ -109,7 +109,22 @@ function loop(timestamp) {
   let deltaTime = timestamp - prevTime;
   // let deltaTime = 1;
   prevTime = timestamp;
-  update(deltaTime)
+
+  ctx.fillStyle = "black";
+  ctx.fillRect(0, 0, width, height);
+  ctx.fillStyle = "white";
+  ctx.font = "40px Arial";
+  fillTextCenteredHorizontally(ctx, "Pong", width / 2, 140);
+  ctx.font = "30px Arial";
+  fillTextCenteredHorizontally(ctx, "Play", width / 2, 220);
+  fillTextCenteredHorizontally(ctx, "Multiplayer", width / 2, 260);
+
+//   update(deltaTime)
   requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
+
+function fillTextCenteredHorizontally(ctx, text, x, y) {
+    const width = ctx.measureText(text).width;
+    ctx.fillText(text, x - width / 2, y);
+}

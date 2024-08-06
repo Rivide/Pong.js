@@ -124,13 +124,13 @@ let ball = {
 let playerLeft = new Player(paddleOffset, height / 2 - paddleHeight / 2);
 let playerRight = new Player(width - paddleOffset - paddleWidth, height / 2 - paddleHeight / 2);
 
-let player1Side = null;
+// let player1Side = null;
 
-// let player1Id = null;
-// let player2Id = null;
+// // let player1Id = null;
+// // let player2Id = null;
 
-let playerLeftSocket = null;
-let playerRightSocket = null;
+// let playerLeftSocket = null;
+// let playerRightSocket = null;
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
