@@ -398,13 +398,16 @@ function updateOnline(deltaTime) {
 }
 
 let screen = "menu";
+let state = {
+  screen: "menu",
+  state: null
+};
 
 let prevTime = 0;
 function loop(timestamp) {
   let deltaTime = timestamp - prevTime;
   // let deltaTime = 1;
   prevTime = timestamp;
-
 
   // fillTextCenteredHorizontally(ctx, "2 Player", width / 2, 220);
   // fillTextCenteredHorizontally(ctx, "Online", width / 2, 260);
