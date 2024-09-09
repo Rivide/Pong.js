@@ -113,6 +113,23 @@ function updateBall(clientBall, serverBall) {
   clientBall.inPlay = serverBall.inPlay;
 }
 
+// class TwoPlayerState {
+//   playerLeft;
+//   playerRight;
+//   ball;
+//   timeToRound;
+
+//   constructor() {
+//     this.playerLeft = new Player(height / 2 - paddleHeight / 2);
+//     this.playerRight = new Player(height / 2 - paddleHeight / 2);
+//     // this.ball = 
+//   }
+// }
+
+// class TwoPlayerBall {
+
+// }
+
 let twoPlayerState = (() => {
   let playerLeft = new Player(height / 2 - paddleHeight / 2);
   let playerRight = new Player(height / 2 - paddleHeight / 2);
@@ -210,6 +227,28 @@ let twoPlayerState = (() => {
     playerRight,
     ball,
     timeToRound: 0
+  };
+})();
+
+let onlineState = (() => {
+  let playerLeft = new ClientPlayer(height / 2 - paddleHeight / 2);
+  let playerRight = new ClientPlayer(height / 2 - paddleHeight / 2);
+  let ball = {
+    x: 0,
+    y: 0,
+    width: 10,
+    height: 10,
+    inPlay: false,
+    draw: function(ctx) {
+        if (this.inPlay) {
+            ctx.fillRect(this.x, this.y, this.width, this.height);
+        }
+    }
+  };
+  return {
+    playerLeft,
+    playerRight,
+    ball
   };
 })();
 
