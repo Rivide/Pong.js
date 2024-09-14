@@ -222,11 +222,70 @@ let twoPlayerState = (() => {
 
     }
   };
+  let timeToRound = 0;
+
+  function update(ctx, deltaTime) {
+    let playerLeftInputDirection = 0;
+    if (keys.w) {
+        playerLeftInputDirection -= 1;
+    }
+    if (keys.s) {
+        playerLeftInputDirection += 1;
+    }
+    let playerRightInputDirection = 0;
+    if (keys.ArrowUp) {
+        playerRightInputDirection -= 1;
+    }
+    if (keys.ArrowDown) {
+        playerRightInputDirection += 1;
+    }
+    // playerLeft.direction = playerLeftInputDirection;
+    // playerRight.direction = playerRightInputDirection;
+    playerLeft.update(playerLeftInputDirection, deltaTime);
+    playerRight.update(playerRightInputDirection, deltaTime);
+    if (!ball.inPlay) {
+      timeToRound -= deltaTime;
+      if (timeToRound <= 0) {
+        ball.setInPlay();
+      }
+    }
+    if (ball.inPlay) {
+      ball.move(deltaTime);
+      if (ball.x < 0 || ball.x + ballWidth > width) {
+        if (ball.x < 0) {
+          playerRight.score++;
+        }
+        else {
+          playerLeft.score++;
+        }
+        console.log("Scores: " + playerLeft.score + " - " + playerRight.score);
+        ball.setOutOfPlay();
+        timeToRound = roundDelay;
+      }
+    }
+  
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, width, height);
+  
+    ctx.fillStyle = "white";
+    ctx.font = "64px monospace";
+    ctx.textBaseline = "top";
+    ctx.textAlign = "right";
+    ctx.fillText(playerLeft.score, width / 2 - scoreOffsetX, scoreOffsetY);
+    ctx.textAlign = "left";
+    ctx.fillText(playerRight.score, width / 2 + scoreOffsetX, scoreOffsetY);
+  
+    ball.draw(ctx);
+    playerLeft.draw(ctx, paddleOffset, paddleWidth, paddleHeight);
+    playerRight.draw(ctx, width - paddleOffset - paddleWidth, paddleWidth, paddleHeight);
+  }
+
   return {
     playerLeft,
     playerRight,
     ball,
-    timeToRound: 0
+    timeToRound: 0,
+    update: update
   };
 })();
 
@@ -456,7 +515,8 @@ function loop(timestamp) {
       break;
     }
     case "two player": {
-      updateTwoPlayer(twoPlayerState, deltaTime);
+      twoPlayerState.update(ctx, deltaTime);
+      // updateTwoPlayer(twoPlayerState, deltaTime);
       break;
     }
     case "online": {
