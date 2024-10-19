@@ -304,6 +304,33 @@ let onlineState = (() => {
         }
     }
   };
+
+  function update(deltaTime) {
+    let inputDirection = 0;
+    if (keys.w || keys.ArrowUp) {
+        inputDirection -= 1;
+    }
+    if (keys.s || keys.ArrowDown) {
+        inputDirection += 1;
+    }
+    socket.emit("input direction", inputDirection);
+  
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, width, height);
+  
+    ctx.fillStyle = "white";
+    ctx.font = "64px monospace";
+    ctx.textBaseline = "top";
+    ctx.textAlign = "right";
+    ctx.fillText(playerLeft.score, width / 2 - scoreOffsetX, scoreOffsetY);
+    ctx.textAlign = "left";
+    ctx.fillText(playerRight.score, width / 2 + scoreOffsetX, scoreOffsetY);
+  
+    ball.draw(ctx);
+    playerLeft.draw(ctx, paddleOffset, paddleWidth, paddleHeight);
+    playerRight.draw(ctx, width - paddleOffset - paddleWidth, paddleWidth, paddleHeight);
+  }
+
   return {
     playerLeft,
     playerRight,
