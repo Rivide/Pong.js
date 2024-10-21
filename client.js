@@ -304,8 +304,23 @@ let onlineState = (() => {
         }
     }
   };
+  let socket = null;
+  let side = null;
 
-  function update(deltaTime) {
+  function startOnline() {
+    socket = io();
+    socket.on("side", sideFromServer => {
+      side = sideFromServer;
+    });
+    
+    socket.on("state", state => {
+      updatePlayer(playerLeft, state.playerLeft);
+      updatePlayer(playerRight, state.playerRight);
+      updateBall(ball, state.ball);
+    });
+  }
+
+  function update(ctx, deltaTime) {
     let inputDirection = 0;
     if (keys.w || keys.ArrowUp) {
         inputDirection -= 1;
@@ -334,7 +349,9 @@ let onlineState = (() => {
   return {
     playerLeft,
     playerRight,
-    ball
+    ball,
+    startOnline: startOnline,
+    update: update
   };
 })();
 
@@ -432,95 +449,95 @@ let onlineState = (() => {
 //   timeToRound: 0
 // }
 
-function updateTwoPlayer(state, deltaTime) {
-  let {
-    playerLeft,
-    playerRight,
-    ball,
-    timeToRound
-  } = state;
-  let playerLeftInputDirection = 0;
-  if (keys.w) {
-      playerLeftInputDirection -= 1;
-  }
-  if (keys.s) {
-      playerLeftInputDirection += 1;
-  }
-  let playerRightInputDirection = 0;
-  if (keys.ArrowUp) {
-      playerRightInputDirection -= 1;
-  }
-  if (keys.ArrowDown) {
-      playerRightInputDirection += 1;
-  }
-  // playerLeft.direction = playerLeftInputDirection;
-  // playerRight.direction = playerRightInputDirection;
-  playerLeft.update(playerLeftInputDirection, deltaTime);
-  playerRight.update(playerRightInputDirection, deltaTime);
-  if (!ball.inPlay) {
-    timeToRound -= deltaTime;
-    if (timeToRound <= 0) {
-      ball.setInPlay();
-    }
-  }
-  if (ball.inPlay) {
-    ball.move(deltaTime);
-    if (ball.x < 0 || ball.x + ballWidth > width) {
-      if (ball.x < 0) {
-        playerRight.score++;
-      }
-      else {
-        playerLeft.score++;
-      }
-      console.log("Scores: " + playerLeft.score + " - " + playerRight.score);
-      ball.setOutOfPlay();
-      timeToRound = roundDelay;
-    }
-  }
+// function updateTwoPlayer(state, deltaTime) {
+//   let {
+//     playerLeft,
+//     playerRight,
+//     ball,
+//     timeToRound
+//   } = state;
+//   let playerLeftInputDirection = 0;
+//   if (keys.w) {
+//       playerLeftInputDirection -= 1;
+//   }
+//   if (keys.s) {
+//       playerLeftInputDirection += 1;
+//   }
+//   let playerRightInputDirection = 0;
+//   if (keys.ArrowUp) {
+//       playerRightInputDirection -= 1;
+//   }
+//   if (keys.ArrowDown) {
+//       playerRightInputDirection += 1;
+//   }
+//   // playerLeft.direction = playerLeftInputDirection;
+//   // playerRight.direction = playerRightInputDirection;
+//   playerLeft.update(playerLeftInputDirection, deltaTime);
+//   playerRight.update(playerRightInputDirection, deltaTime);
+//   if (!ball.inPlay) {
+//     timeToRound -= deltaTime;
+//     if (timeToRound <= 0) {
+//       ball.setInPlay();
+//     }
+//   }
+//   if (ball.inPlay) {
+//     ball.move(deltaTime);
+//     if (ball.x < 0 || ball.x + ballWidth > width) {
+//       if (ball.x < 0) {
+//         playerRight.score++;
+//       }
+//       else {
+//         playerLeft.score++;
+//       }
+//       console.log("Scores: " + playerLeft.score + " - " + playerRight.score);
+//       ball.setOutOfPlay();
+//       timeToRound = roundDelay;
+//     }
+//   }
 
-  ctx.fillStyle = "black";
-  ctx.fillRect(0, 0, width, height);
+//   ctx.fillStyle = "black";
+//   ctx.fillRect(0, 0, width, height);
 
-  ctx.fillStyle = "white";
-  ctx.font = "64px monospace";
-  ctx.textBaseline = "top";
-  ctx.textAlign = "right";
-  ctx.fillText(playerLeft.score, width / 2 - scoreOffsetX, scoreOffsetY);
-  ctx.textAlign = "left";
-  ctx.fillText(playerRight.score, width / 2 + scoreOffsetX, scoreOffsetY);
+//   ctx.fillStyle = "white";
+//   ctx.font = "64px monospace";
+//   ctx.textBaseline = "top";
+//   ctx.textAlign = "right";
+//   ctx.fillText(playerLeft.score, width / 2 - scoreOffsetX, scoreOffsetY);
+//   ctx.textAlign = "left";
+//   ctx.fillText(playerRight.score, width / 2 + scoreOffsetX, scoreOffsetY);
 
-  ball.draw(ctx);
-  playerLeft.draw(ctx, paddleOffset, paddleWidth, paddleHeight);
-  playerRight.draw(ctx, width - paddleOffset - paddleWidth, paddleWidth, paddleHeight);
+//   ball.draw(ctx);
+//   playerLeft.draw(ctx, paddleOffset, paddleWidth, paddleHeight);
+//   playerRight.draw(ctx, width - paddleOffset - paddleWidth, paddleWidth, paddleHeight);
 
-  state.timeToRound = timeToRound;
-}
+//   state.timeToRound = timeToRound;
+// }
 
-function updateOnline(deltaTime) {
-  let inputDirection = 0;
-  if (keys.w || keys.ArrowUp) {
-      inputDirection -= 1;
-  }
-  if (keys.s || keys.ArrowDown) {
-      inputDirection += 1;
-  }
-  socket.emit("input direction", inputDirection);
+// function updateOnline(deltaTime) {
+//   let inputDirection = 0;
+//   if (keys.w || keys.ArrowUp) {
+//       inputDirection -= 1;
+//   }
+//   if (keys.s || keys.ArrowDown) {
+//       inputDirection += 1;
+//   }
+//   socket.emit("input direction", inputDirection);
 
-  ctx.fillStyle = "black";
-  ctx.fillRect(0, 0, width, height);
+//   ctx.fillStyle = "black";
+//   ctx.fillRect(0, 0, width, height);
 
-  ctx.fillStyle = "white";
-  ctx.font = "64px monospace";
-  ctx.textBaseline = "top";
-  ctx.textAlign = "right";
-  ctx.fillText(playerLeft.score, width / 2 - scoreOffsetX, scoreOffsetY);
-  ctx.textAlign = "left";
-  ctx.fillText(playerRight.score, width / 2 + scoreOffsetX, scoreOffsetY);
+//   ctx.fillStyle = "white";
+//   ctx.font = "64px monospace";
+//   ctx.textBaseline = "top";
+//   ctx.textAlign = "right";
+//   ctx.fillText(playerLeft.score, width / 2 - scoreOffsetX, scoreOffsetY);
+//   ctx.textAlign = "left";
+//   ctx.fillText(playerRight.score, width / 2 + scoreOffsetX, scoreOffsetY);
 
-  ball.draw(ctx);
-  playerLeft.draw(ctx, paddleOffset, paddleWidth, paddleHeight);
-  playerRight.draw(ctx, width - paddleOffset - paddleWidth, paddleWidth, paddleHeight);
-}
+//   ball.draw(ctx);
+//   playerLeft.draw(ctx, paddleOffset, paddleWidth, paddleHeight);
+//   playerRight.draw(ctx, width - paddleOffset - paddleWidth, paddleWidth, paddleHeight);
+// }
 
 let screen = "menu";
 let state = {
@@ -547,7 +564,8 @@ function loop(timestamp) {
       break;
     }
     case "online": {
-      updateOnline(deltaTime);
+      onlineState.update(ctx, deltaTime);
+      // updateOnline(deltaTime);
       break;
     }
   }
@@ -564,16 +582,17 @@ function startTwoPlayer() {
 
 function startOnline() {
   screen = "online";
-  socket = io();
-  socket.on("side", sideFromServer => {
-    side = sideFromServer;
-  });
+  onlineState.startOnline();
+  // socket = io();
+  // socket.on("side", sideFromServer => {
+  //   side = sideFromServer;
+  // });
   
-  socket.on("state", state => {
-    updatePlayer(playerLeft, state.playerLeft);
-    updatePlayer(playerRight, state.playerRight);
-    updateBall(ball, state.ball);
-  });
+  // socket.on("state", state => {
+  //   updatePlayer(playerLeft, state.playerLeft);
+  //   updatePlayer(playerRight, state.playerRight);
+  //   updateBall(ball, state.ball);
+  // });
 }
 
 function menu() {
