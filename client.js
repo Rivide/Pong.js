@@ -250,7 +250,52 @@ let twoPlayerState = (() => {
       }
     }
     if (ball.inPlay) {
-      ball.move(deltaTime);
+      // Move according to velocity
+      ball.x += ball.directionX * ballSpeed * deltaTime;
+      ball.y += ball.directionY * ballSpeed * deltaTime;
+
+      // On collision with the top or bottom of the screen,
+      // 1. flip directionY
+      // 2. move the ball back into the screen
+      if (ball.y < 0 || ball.y + ballHeight > height) {
+          ball.directionY = -ball.directionY;
+          if (ball.y < 0) {
+              ball.y = -ball.y;
+          }
+          else {
+              // ball.y = height + height - ball.y - ball.height;
+              // ball.y -= 2 * (ball.y + ball.height - height);
+              ball.y = height - (ball.y + ballHeight - height) - ballHeight;
+          }
+      }
+      // let ballVelocityX = ball.speed * ball.directionX;
+      // let ballVelocityYRelativeToLeftPaddle = ball.speed * ball.directionY - paddleSpeed;
+      console.log(playerLeft)
+      // Paddle collisions
+      if (
+          ball.lastHit != "left" &&
+          ball.x < playerLeftX + paddleWidth &&
+          ball.x > playerLeftX &&
+          ball.y + ballHeight > playerLeft.y &&
+          ball.y < playerLeft.y + paddleHeight
+      ) {
+          ball.directionX = Math.random() / 2 + .5;
+          ball.directionY = Math.sign(Math.random() - .5) *
+          Math.sqrt(1 - Math.pow(ball.directionX, 2));
+          ball.lastHit = "left";
+      }
+      if (
+          ball.lastHit != "right" &&
+          ball.x + ballWidth > playerRightX && 
+          ball.x + ballWidth < playerRightX + paddleWidth &&
+          ball.y + ballHeight > playerRight.y &&
+          ball.y < playerRight.y + paddleHeight
+      ) {
+          ball.directionX = -(Math.random() / 2 + .5);
+          ball.directionY = Math.sign(Math.random() - .5) *
+          Math.sqrt(1 - Math.pow(ball.directionX, 2));
+          ball.lastHit = "right";
+      }
       if (ball.x < 0 || ball.x + ballWidth > width) {
         if (ball.x < 0) {
           playerRight.score++;
