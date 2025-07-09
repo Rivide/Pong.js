@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Pong</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <style>
+      body {
+        margin: 0;
+        height: 100vh;
+      }
+      #canvas {
+        background: black;
+        box-sizing: border-box;
+
+        /* this prevents scrollbars from appearing for some reason */
+        display: block;
+
+        margin: 0 auto;
+
+        /* width: 100vw; */
+        /* width: 30vw;
+        height: 100vh; */
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas"></canvas>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="client.js"></script>
+  </body>
+</html>

@@ -1,3 +1,4 @@
+const WORLD_TO_CANVAS = 1000
 let socket = null;
 
 let canvas = document.getElementById("canvas");
@@ -310,6 +311,7 @@ let twoPlayerState = (() => {
       }
     }
   
+		// Draw background
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, width, height);
   
@@ -324,8 +326,10 @@ let twoPlayerState = (() => {
     if (ball.inPlay) {
         ctx.fillRect(ball.x, ball.y, ballWidth, ballHeight);
     }
-    playerLeft.draw(ctx, paddleOffset, paddleWidth, paddleHeight);
-    playerRight.draw(ctx, width - paddleOffset - paddleWidth, paddleWidth, paddleHeight);
+    ctx.fillRect(paddleOffset, playerLeft.y, paddleWidth, paddleHeight);
+    ctx.fillRect(width - paddleOffset - paddleWidth, playerLeft.y, paddleWidth, paddleHeight);
+    //playerLeft.draw(ctx, paddleOffset, paddleWidth, paddleHeight);
+    //playerRight.draw(ctx, width - paddleOffset - paddleWidth, paddleWidth, paddleHeight);
   }
 
   return {
@@ -592,6 +596,24 @@ let state = {
   screen: "menu",
   state: null
 };
+function init() {
+  // canvas.width = CANVAS_WIDTH
+  // canvas.height = CANVAS_HEIGHT
+  updateCanvasDimensions()
+  window.addEventListener('resize', updateCanvasDimensions)
+  //canvas.addEventListener('mousemove', onMouseMove)
+  // Need passive: false for some Chrome-specific thing?
+  // https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent
+  window.addEventListener('touchstart', onTouchStart, {passive: false})
+  window.addEventListener('touchmove', onTouchMove, {passive: false})
+  window.addEventListener('touchend', onTouchEnd, {passive: false})
+  window.addEventListener('touchcancel', onTouchEnd, {passive: false})
+
+  //x = worldUnits(canvas.width) / 2 - PLAYER_WIDTH / 2
+  //y = worldUnits(canvas.height) / 2 - PLAYER_HEIGHT / 2
+
+  requestAnimationFrame(loop)
+}
 
 let prevTime = 0;
 function loop(timestamp) {
@@ -740,3 +762,70 @@ function drawButton(ctx, text, x, y) {
   // ctx.lineTo(x1, y1);
   // ctx.stroke();
 }
+const ongoingTouches = [];
+
+function onTouchStart(event) {
+  event.preventDefault();
+  const touches = event.changedTouches
+  for (let i = 0; i < touches.length; i++) {
+    ongoingTouches.push(copyTouch(touches[i]))
+  }
+}
+function onTouchMove(event) {
+  event.preventDefault();
+  const touches = event.changedTouches
+  for (let i = 0; i < touches.length; i++) {
+    let touch = touches[i]
+    const ongoingTouchIndex = ongoingTouches.findIndex(ongoingTouch => ongoingTouch.identifier === touch.identifier)
+    if (ongoingTouchIndex !== -1) {
+      const ongoingTouch = ongoingTouches[ongoingTouchIndex]
+      //x += worldUnits(touch.clientX - ongoingTouch.clientX)
+      //y += worldUnits(touch.clientY - ongoingTouch.clientY)
+      ongoingTouches.splice(ongoingTouchIndex, 1, copyTouch(touch))
+    }
+  }
+}
+function onTouchEnd(event) {
+  event.preventDefault()
+  const touches = event.changedTouches
+  for (let i = 0; i < touches.length; i++) {
+    const touch = touches[i]
+    const ongoingTouchResult = findOngoingTouch(touch.identifier)
+    if (ongoingTouchResult == null) {
+      continue;
+    }
+    const [ongoingTouchIndex, ongoingTouch] = ongoingTouchResult
+    ongoingTouches.splice(ongoingTouchIndex, 1)
+  }
+}
+function findOngoingTouch(identifier) {
+  for (let [i, touch] of ongoingTouches.entries()) {
+    if (touch.identifier === identifier) {
+      return [i, touch]
+    }
+  }
+  return null
+}
+
+function copyTouch({ identifier, clientX, clientY }) {
+  return { identifier, clientX, clientY };
+}
+function canvasUnits(worldUnits) {
+  return Math.floor(worldUnits * canvasScale())
+}
+
+function worldUnits(canvasUnits) {
+  return canvasUnits / canvasScale()
+}
+
+function canvasScale() {
+	return 1;
+  if (canvas.width * 1.6 < canvas.height) {
+    return canvas.width * 1.6 / WORLD_TO_CANVAS
+  } else {
+    return canvas.height / WORLD_TO_CANVAS
+  }
+}
+// For some reason scrollbars will randomly appear on page load unless you init
+// in an onload event listener.
+//window.addEventListener('load', init);
