@@ -14,7 +14,7 @@ const paddleOffset = 60;
 const paddleSpeed = .25;
 
 const playerLeftX = paddleOffset;
-const playerRightX = width - paddleOffset - paddleWidth;
+const playerRightX = canvas.width - paddleOffset - paddleWidth;
 
 const ballSize = 10;
 const ballSpeed = .25;
@@ -22,11 +22,11 @@ const ballSpeed = .25;
 let scoreOffsetX = 80;
 let scoreOffsetY = 30;
 
-const playButtonX = width / 2;
+const playButtonX = canvas.width / 2;
 const playButtonY = 220;
-const twoPlayerButtonX = width / 2;
+const twoPlayerButtonX = canvas.width / 2;
 const twoPlayerButtonY = 260;
-const onlineButtonX = width / 2;
+const onlineButtonX = canvas.width / 2;
 const onlineButtonY = 300;
 
 let keys = {
@@ -168,7 +168,7 @@ let twoPlayerState = (() => {
     // playerRight.direction = playerRightInputDirection;
     function movePlayer(player, direction) {
       player.y = Math.max(Math.min(player.y + paddleSpeed * direction *
-          deltaTime, height - paddleHeight), 0);
+          deltaTime, canvas.height - paddleHeight), 0);
     }
     movePlayer(playerLeft, playerLeftInputDirection);
     movePlayer(playerRight, playerRightInputDirection);
@@ -177,8 +177,8 @@ let twoPlayerState = (() => {
     if (!ball.inPlay) {
       timeToRound -= deltaTime;
       if (timeToRound <= 0) {
-        ball.x = width / 2 - ballSize / 2;
-        ball.y = Math.random() * (height - ballSize);
+        ball.x = canvas.width / 2 - ballSize / 2;
+        ball.y = Math.random() * (canvas.height - ballSize);
         // let angle = Math.random() * 2 * Math.PI;
         ball.directionX = Math.sign(Math.random() - .5) * (Math.random() / 2 + .5);
         ball.directionY = Math.sign(Math.random() - .5) *
@@ -195,15 +195,15 @@ let twoPlayerState = (() => {
       // On collision with the top or bottom of the screen,
       // 1. flip directionY
       // 2. move the ball back into the screen
-      if (ball.y < 0 || ball.y + ballSize > height) {
+      if (ball.y < 0 || ball.y + ballSize > canvas.height) {
           ball.directionY = -ball.directionY;
           if (ball.y < 0) {
               ball.y = -ball.y;
           }
           else {
-              // ball.y = height + height - ball.y - ball.height;
-              // ball.y -= 2 * (ball.y + ball.height - height);
-              ball.y = height - (ball.y + ballSize - height) - ballSize;
+              // ball.y = canvas.height + canvas.height - ball.y - ball.canvas.height;
+              // ball.y -= 2 * (ball.y + ball.canvas.height - canvas.height);
+              ball.y = canvas.height - (ball.y + ballSize - canvas.height) - ballSize;
           }
       }
       // let ballVelocityX = ball.speed * ball.directionX;
@@ -234,7 +234,7 @@ let twoPlayerState = (() => {
           Math.sqrt(1 - Math.pow(ball.directionX, 2));
           ball.lastHit = "right";
       }
-      if (ball.x < 0 || ball.x + ballSize > width) {
+      if (ball.x < 0 || ball.x + ballSize > canvas.width) {
         if (ball.x < 0) {
           playerRight.score++;
         }
@@ -250,7 +250,7 @@ let twoPlayerState = (() => {
   
 		// Draw background
     ctx.fillStyle = "black";
-    ctx.fillRect(0, 0, canvas.width, height);
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
   
     ctx.fillStyle = "white";
     ctx.font = "64px monospace";
@@ -261,7 +261,7 @@ let twoPlayerState = (() => {
     ctx.fillText(playerRight.score, canvas.width / 2 + scoreOffsetX, scoreOffsetY);
   
     if (ball.inPlay) {
-        ctx.fillRect(ball.x, ball.y, ballSize, ballSize);
+        drawRect(ball.x, ball.y, ballSize, ballSize);
     }
     drawPlayerLeft(playerLeft);
     drawPlayerRight(playerRight);
@@ -284,11 +284,11 @@ let onlineState = (() => {
   // let playerLeft = new ClientPlayer(height / 2 - paddleHeight / 2);
   // let playerRight = new ClientPlayer(height / 2 - paddleHeight / 2);
   let playerLeft = {
-    y: height / 2 - paddleHeight / 2,
+    y: canvas.height / 2 - paddleHeight / 2,
     score: 0
   };
   let playerRight = {
-    y: height / 2 - paddleHeight / 2,
+    y: canvas.height / 2 - paddleHeight / 2,
     score: 0
   };
   let ball = {
@@ -325,7 +325,7 @@ let onlineState = (() => {
     socket.emit("input direction", inputDirection);
   
     ctx.fillStyle = "black";
-    ctx.fillRect(0, 0, canvas.width, height);
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
   
     ctx.fillStyle = "white";
     ctx.font = "64px monospace";
@@ -337,7 +337,7 @@ let onlineState = (() => {
   
     // ball.draw(ctx);
     if (ball.inPlay) {
-        ctx.fillRect(ball.x, ball.y, ballSize, ballSize);
+        drawRect(ball.x, ball.y, ballSize, ballSize);
     }
     drawPlayerLeft(playerLeft);
     drawPlayerRight(playerRight);
@@ -598,7 +598,7 @@ function loop(timestamp) {
 //   update(deltaTime)
   requestAnimationFrame(loop);
 }
-requestAnimationFrame(loop);
+// requestAnimationFrame(loop);
 
 function startTwoPlayer() {
   screen = "two player";
@@ -621,7 +621,7 @@ function startOnline() {
 
 function menu() {
   ctx.fillStyle = "black";
-  ctx.fillRect(0, 0, canvas.width, height);
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = "white";
   ctx.font = "40px Arial";
   fillTextCenteredHorizontally(ctx, "Pong", canvas.width / 2, 140);
@@ -777,7 +777,24 @@ function drawRect(x, y, width, height, color) {
 
 function drawBackground() {
   ctx.fillStyle = "black";
-  ctx.fillRect(0, 0, canvas.width, height);
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+}
+
+function updateCanvasDimensions() {
+  return;
+  let canvasWidth;
+  let canvasHeight;
+  if (window.innerHeight > window.innerWidth) {
+    canvasWidth = window.innerWidth;
+    canvasHeight = Math.min(canvasWidth * 3, window.innerHeight);
+  } else {
+    canvasHeight = window.innerHeight;
+    canvasWidth = Math.min(Math.floor(canvasHeight * 1.6), window.innerWidth);
+  }
+  canvas.style.width = canvasWidth + "px";
+  canvas.style.height = canvasHeight + "px";
+  canvas.width = canvasWidth;
+  canvas.height = canvasHeight;
 }
 
 function canvasUnits(worldUnits) {
@@ -798,4 +815,4 @@ function canvasScale() {
 }
 // For some reason scrollbars will randomly appear on page load unless you init
 // in an onload event listener.
-//window.addEventListener('load', init);
+window.addEventListener('load', init);
