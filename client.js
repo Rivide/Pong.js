@@ -13,8 +13,8 @@ const paddleHeight = 40;
 const paddleOffset = 60;
 const paddleSpeed = .25;
 
-const playerLeftX = paddleOffset;
-const playerRightX = canvas.width - paddleOffset - paddleWidth;
+// const playerLeftX = paddleOffset;
+// const playerRightX = canvas.width - paddleOffset - paddleWidth;
 
 const ballSize = 10;
 const ballSpeed = .25;
@@ -132,11 +132,11 @@ function updateBall(clientBall, serverBall) {
 
 let twoPlayerState = (() => {
   let playerLeft = {
-    y: height / 2 - paddleHeight / 2,
+    y: canvas.height / 2 - paddleHeight / 2,
     score: 0
   };
   let playerRight = {
-    y: height / 2 - paddleHeight / 2,
+    y: canvas.height / 2 - paddleHeight / 2,
     score: 0
   };
   let ball = {
@@ -168,7 +168,7 @@ let twoPlayerState = (() => {
     // playerRight.direction = playerRightInputDirection;
     function movePlayer(player, direction) {
       player.y = Math.max(Math.min(player.y + paddleSpeed * direction *
-          deltaTime, canvas.height - paddleHeight), 0);
+          deltaTime, worldUnits(canvas.height) - paddleHeight), 0);
     }
     movePlayer(playerLeft, playerLeftInputDirection);
     movePlayer(playerRight, playerRightInputDirection);
@@ -212,8 +212,8 @@ let twoPlayerState = (() => {
       // Paddle collisions
       if (
           ball.lastHit != "left" &&
-          ball.x < playerLeftX + paddleWidth &&
-          ball.x > playerLeftX &&
+          ball.x < playerLeftX() + paddleWidth &&
+          ball.x > playerLeftX() &&
           ball.y + ballSize > playerLeft.y &&
           ball.y < playerLeft.y + paddleHeight
       ) {
@@ -224,8 +224,8 @@ let twoPlayerState = (() => {
       }
       if (
           ball.lastHit != "right" &&
-          ball.x + ballSize > playerRightX && 
-          ball.x + ballSize < playerRightX + paddleWidth &&
+          ball.x + ballSize > playerRightX() && 
+          ball.x + ballSize < playerRightX() + paddleWidth &&
           ball.y + ballSize > playerRight.y &&
           ball.y < playerRight.y + paddleHeight
       ) {
@@ -354,11 +354,19 @@ let onlineState = (() => {
 })();
 
 function drawPlayerLeft(playerLeft) {
-  drawRect(paddleOffset, playerLeft.y, paddleWidth, paddleHeight, "white");
+  drawRect(playerLeftX(), playerLeft.y, paddleWidth, paddleHeight, "white");
 }
 
 function drawPlayerRight(playerRight) {
-  drawRect(canvas.width - paddleOffset - paddleWidth, playerRight.y, paddleWidth, paddleHeight, "white");
+  drawRect(playerRightX(), playerRight.y, paddleWidth, paddleHeight, "white");
+}
+
+function playerLeftX() {
+  return paddleOffset;
+}
+
+function playerRightX() {
+  return worldUnits(canvas.width) - paddleOffset - paddleWidth;
 }
 
 // let twoPlayerState = {
@@ -781,7 +789,7 @@ function drawBackground() {
 }
 
 function updateCanvasDimensions() {
-  return;
+  // return;
   let canvasWidth;
   let canvasHeight;
   if (window.innerHeight > window.innerWidth) {
@@ -791,6 +799,20 @@ function updateCanvasDimensions() {
     canvasHeight = window.innerHeight;
     canvasWidth = Math.min(Math.floor(canvasHeight * 1.6), window.innerWidth);
   }
+  if (window.innerHeight > window.innerWidth) {
+    canvasWidth = window.innerWidth;
+    canvasHeight = Math.min(canvasWidth * 3, window.innerHeight);
+  } else {
+    canvasHeight = 480;
+    canvasWidth = 600;
+  }
+  // if (window.innerHeight > window.innerWidth) {
+  //   canvasWidth = Math.min(window.innerWidth, 600);
+  //   canvasHeight = Math.min(canvasWidth * 3, window.innerHeight, 480);
+  // } else {
+  //   canvasHeight = Math.min(window.innerHeight, 480);
+  //   canvasWidth = Math.min(Math.floor(canvasHeight * 1.6), window.innerWidth, 600);
+  // }
   canvas.style.width = canvasWidth + "px";
   canvas.style.height = canvasHeight + "px";
   canvas.width = canvasWidth;
@@ -798,19 +820,19 @@ function updateCanvasDimensions() {
 }
 
 function canvasUnits(worldUnits) {
-  return Math.floor(worldUnits * canvasScale())
+  return Math.floor(worldUnits * canvasScale());
 }
 
 function worldUnits(canvasUnits) {
-  return canvasUnits / canvasScale()
+  return canvasUnits / canvasScale();
 }
 
 function canvasScale() {
-	return 1;
+	// return 1;
   if (canvas.width * 1.6 < canvas.height) {
-    return canvas.width * 1.6 / WORLD_TO_CANVAS
+    return canvas.width * 1.6 / WORLD_TO_CANVAS;
   } else {
-    return canvas.height / WORLD_TO_CANVAS
+    return canvas.height / WORLD_TO_CANVAS;
   }
 }
 // For some reason scrollbars will randomly appear on page load unless you init
